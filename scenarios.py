@@ -3,14 +3,15 @@
     * Simulação dos cenários descritos no item 4 do trabalho
 """
 
-from mm1 import *
+from metrics import *
 
 SIMULATION_TIME = 100
+
 
 def print_scenario_information(scenario, Lambda, mu, simulation_time = SIMULATION_TIME):
     print(f"-------------- CASO {scenario} --------------")
     print(f"λ = {Lambda} & μ = {mu}")
-    mean_customers_per_round, mean_waiting_time_per_round = get_means_per_round(simulation_time, Lambda, mu)
+    mean_customers_per_round, mean_waiting_time_per_round = run_simulation(simulation_time, Lambda, mu)
 
     mean_customers_on_system = get_mean(mean_customers_per_round)
     variance_customers_on_system = get_variance(mean_customers_per_round, mean_customers_on_system)
@@ -33,27 +34,9 @@ def print_scenario_information(scenario, Lambda, mu, simulation_time = SIMULATIO
     print("Fração de vezes que o sistema atinge o estado 0: ") # TODO
     print("--------------------------------\n")
 
-def first_scenario():
-    Lambda = 1
-    mu = 2
-    print_scenario_information(1, Lambda, mu)
 
-def second_scenario():
-    Lambda = 2
-    mu = 4
-    print_scenario_information(2, Lambda, mu)
-
-def third_scenario():
-    Lambda = 1.05
-    mu = 1
-    print_scenario_information(3, Lambda, mu)
-
-def fourth_scenario():
-    Lambda = 1.10
-    mu = 1
-    print_scenario_information(4, Lambda, mu)
-
-first_scenario()
-second_scenario()
-third_scenario()
-fourth_scenario()
+if __name__ == "__main__":
+    print_scenario_information(scenario=1, Lambda=1, mu=2) # Cenario 1
+    print_scenario_information(scenario=2, Lambda=2, mu=4) # Cenario 2
+    print_scenario_information(scenario=3, Lambda=1.05, mu=1) # Cenario 3
+    print_scenario_information(scenario=4, Lambda=1.10, mu=1) # Cenario 4
