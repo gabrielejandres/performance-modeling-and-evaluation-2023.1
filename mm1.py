@@ -19,8 +19,11 @@ def initialize():
     last_event_time = 0 # tempo do ultimo evento
     times_on_zero = 0 # quantidade de vezes em zero
     total_events = 0 # quantidade total de eventos
+    arrival_instants = [] # instantes de chegada dos clientes
+    waiting_density = {} # desidade do tempo de espera
+    number_clients_density = {} # densidade do numero de clientes no sistema
 
-    return elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events
+    return elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density
 
 
 def generate_first_event(Lambda):
@@ -32,7 +35,7 @@ def generate_first_event(Lambda):
 
 def simulate_queue(simulation_time, Lambda, mu):
     """ Simula a fila M/M/1 """
-    elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events = initialize()
+    elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density = initialize()
 
     # Gerar um evento inicial de chegada
     initial_event = generate_first_event(Lambda)
@@ -50,10 +53,14 @@ def simulate_queue(simulation_time, Lambda, mu):
             break
         
         # print(event)
+        
+        # atualiza a densidade do numero de clientes no sistema
+        number_clients_density[customers_on_system] = number_clients_density.get(customers_on_system, 0) + 1
 
         # se o evento for um evento de chegada
         if event.type == EventType.ARRIVAL: 
             elapsed_time = event.time # tempo atual recebe o tempo do evento
+            arrival_instants.append(elapsed_time) # adiciona o tempo de chegada do cliente na lista de tempos de chegada
             area += customers_on_system * (elapsed_time - last_event_time) # area recebe o numero de clientes no sistema multiplicado pelo tempo que eles ficaram no sistema
             customers_arrived += 1 # incrementa o numero de clientes que chegaram no sistema
             customers_on_system += 1 # incrementa o numero de clientes no sistema
@@ -75,6 +82,9 @@ def simulate_queue(simulation_time, Lambda, mu):
             area += customers_on_system * (elapsed_time - last_event_time) # area recebe o numero de clientes no sistema multiplicado pelo tempo que eles ficaram no sistema
             customers_on_system -= 1 # decrementa o numero de clientes no sistema
             last_event_time = elapsed_time # atualiza o tempo do ultimo evento
+
+            truncated_waiting_time = round(elapsed_time - arrival_instants[customers_served], 2) # tempo de espera do cliente que acabou de sair do sistema
+            waiting_density[truncated_waiting_time] = waiting_density.get(truncated_waiting_time, 0) + 1 # atualiza a densidade do tempo de espera
             customers_served += 1 # incrementa o numero de clientes que foram atendidos
             
             # só adiciona um evento de partida se não for o último cliente a sair do sistema
@@ -89,5 +99,6 @@ def simulate_queue(simulation_time, Lambda, mu):
                 times_on_zero += 1
 
 
+
     # print(customers_arrived, area)
-    return area, customers_arrived, times_on_zero/total_events
+    return area, customers_arrived, times_on_zero/total_events, waiting_density, number_clients_density

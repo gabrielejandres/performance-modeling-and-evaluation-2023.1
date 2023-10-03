@@ -4,6 +4,7 @@
 """
 
 from metrics import *
+from graphs import plot_cdf_number_clients, plot_cdf_waiting_time
 
 SIMULATION_TIME = 100
 
@@ -11,7 +12,7 @@ SIMULATION_TIME = 100
 def print_scenario_information(scenario, Lambda, mu, simulation_time = SIMULATION_TIME):
     print(f"-------------- CASO {scenario} --------------")
     print(f"λ = {Lambda} & μ = {mu}")
-    mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round = run_simulation(simulation_time, Lambda, mu)
+    mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round, waiting_density, number_clients_density = run_simulation(simulation_time, Lambda, mu)
 
     mean_customers_on_system = get_mean(mean_customers_per_round)
     variance_customers_on_system = get_variance(mean_customers_per_round, mean_customers_on_system)
@@ -34,7 +35,9 @@ def print_scenario_information(scenario, Lambda, mu, simulation_time = SIMULATIO
         print("Média do tempo de espera: ", mean_waiting_time)
         print("-> Intervalo de confiança correspondente: ", confidence_interval_waiting_time)
         print("CDF do número de clientes no sistema: ") # TODO
+        plot_cdf_number_clients(number_clients_density, Lambda, mu)
         print("CDF do tempo de espera no sistema: ") # TODO
+        plot_cdf_waiting_time(waiting_density, Lambda, mu)
         
     print("Fração de vezes que o sistema atinge o estado 0: ", mean_frac_times_on_zero) # TODO
     print("-> Intervalo de confiança correspondente: ", confidence_interval_frac_times_on_zero)

@@ -5,6 +5,7 @@
 
 import sys
 from mm1 import *
+from graphs import plot_cdf_number_clients, plot_cdf_waiting_time
 
 INFINITY = 1000
 
@@ -13,15 +14,17 @@ def run_simulation(simulation_time, Lambda, mu):
     """ Simula infinitas rodadas e calcula a media de clientes e do tempo de espera em cada uma delas"""
     mean_customers_per_round = []
     mean_waiting_time_per_round = []
-    frac_times_on_zero_per_round = []    
+    frac_times_on_zero_per_round = []
+    waiting_density = {}
+    number_clients_density = {}  
     
     for _ in range(INFINITY):
-        area, customers_arrived, frac_times_on_zero = simulate_queue(simulation_time, Lambda, mu)
+        area, customers_arrived, frac_times_on_zero, waiting_density, number_clients_density = simulate_queue(simulation_time, Lambda, mu)
         mean_customers_per_round.append(area/simulation_time)
         mean_waiting_time_per_round.append(area/customers_arrived)
         frac_times_on_zero_per_round.append(frac_times_on_zero)
 
-    return mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round
+    return mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round, waiting_density, number_clients_density
 
 
 def get_mean(mean_per_round):
@@ -46,13 +49,16 @@ def get_confidence_interval(standard_deviation, sample_mean, sample_size):
 
 
 # TODO
-def get_CDF():
-    return 1
+def plot_CDF(waiting_density, number_clients_density, Lambda, mu):
+    plot_cdf_waiting_time(waiting_density, Lambda, mu)
+    plot_cdf_number_clients(number_clients_density, Lambda, mu)
+
+    
 
 
 def main(simulation_time, Lambda, mu):
     print(f"λ = {Lambda} & μ = {mu}")
-    mean_customers_per_round, mean_waiting_time_per_round = run_simulation(simulation_time, Lambda, mu)
+    mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round, waiting_density, number_clients_density = run_simulation(simulation_time, Lambda, mu)
 
     mean_customers_on_system = get_mean(mean_customers_per_round)
     variance_customers_on_system = get_variance(mean_customers_per_round, mean_customers_on_system)
@@ -69,6 +75,7 @@ def main(simulation_time, Lambda, mu):
     print("Média do tempo de espera: ", mean_waiting_time)
     print("-> Intervalo de confiança correspondente: ", confidence_interval_waiting_time)
 
+    plot_CDF(waiting_density, number_clients_density, Lambda, mu)
     # rho = Lambda/mu
     # print("Utilization factor: " + str(rho)) 
 
