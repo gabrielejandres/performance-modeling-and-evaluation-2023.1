@@ -11,7 +11,7 @@ SIMULATION_TIME = 100
 def print_scenario_information(scenario, Lambda, mu, simulation_time = SIMULATION_TIME):
     print(f"-------------- CASO {scenario} --------------")
     print(f"λ = {Lambda} & μ = {mu}")
-    mean_customers_per_round, mean_waiting_time_per_round = run_simulation(simulation_time, Lambda, mu)
+    mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round = run_simulation(simulation_time, Lambda, mu)
 
     mean_customers_on_system = get_mean(mean_customers_per_round)
     variance_customers_on_system = get_variance(mean_customers_per_round, mean_customers_on_system)
@@ -23,6 +23,11 @@ def print_scenario_information(scenario, Lambda, mu, simulation_time = SIMULATIO
     sd_waiting_time = np.sqrt(variance_waiting_time)
     confidence_interval_waiting_time = get_confidence_interval(sd_waiting_time, mean_waiting_time, len(mean_waiting_time_per_round))
 
+    mean_frac_times_on_zero = get_mean(frac_times_on_zero_per_round)
+    variance_frac_times_on_zero = get_variance(frac_times_on_zero_per_round, mean_frac_times_on_zero)
+    sd_frac_times_on_zero = np.sqrt(variance_frac_times_on_zero)
+    confidence_interval_frac_times_on_zero = get_confidence_interval(sd_frac_times_on_zero, mean_frac_times_on_zero, len(frac_times_on_zero_per_round))
+
     if scenario == 1 or scenario == 2:
         print("Média do número de clientes no sistema: ", mean_customers_on_system)
         print("-> Intervalo de confiança correspondente: ", confidence_interval_customers_on_system)
@@ -31,7 +36,8 @@ def print_scenario_information(scenario, Lambda, mu, simulation_time = SIMULATIO
         print("CDF do número de clientes no sistema: ") # TODO
         print("CDF do tempo de espera no sistema: ") # TODO
         
-    print("Fração de vezes que o sistema atinge o estado 0: ") # TODO
+    print("Fração de vezes que o sistema atinge o estado 0: ", mean_frac_times_on_zero) # TODO
+    print("-> Intervalo de confiança correspondente: ", confidence_interval_frac_times_on_zero)
     print("--------------------------------\n")
 
 

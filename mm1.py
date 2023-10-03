@@ -17,8 +17,10 @@ def initialize():
     customers_arrived = 0 # numero de clientes que chegaram no sistema
     area = 0 # area do grafico de clientes no sistema x tempo para usar a lei de little
     last_event_time = 0 # tempo do ultimo evento
+    times_on_zero = 0 # quantidade de vezes em zero
+    total_events = 0 # quantidade total de eventos
 
-    return elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time
+    return elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events
 
 
 def generate_first_event(Lambda):
@@ -30,7 +32,7 @@ def generate_first_event(Lambda):
 
 def simulate_queue(simulation_time, Lambda, mu):
     """ Simula a fila M/M/1 """
-    elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time = initialize()
+    elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events = initialize()
 
     # Gerar um evento inicial de chegada
     initial_event = generate_first_event(Lambda)
@@ -41,6 +43,7 @@ def simulate_queue(simulation_time, Lambda, mu):
     # Começar o loop da simulação (enquanto tempo atual for menor que o tempo total de simulação)
     while elapsed_time <= simulation_time:
         event = heapq.heappop(customers_queue)
+        total_events += 1
 
         # Interrompe o loop se o tempo do evento for posterior ao final da simulação
         if event.time > simulation_time: 
@@ -59,7 +62,7 @@ def simulate_queue(simulation_time, Lambda, mu):
             next_arrival_event = Event(EventType.ARRIVAL, next_arrival_time) # cria um evento de chegada com o tempo da proxima chegada
             heapq.heappush(customers_queue, next_arrival_event) # adiciona o evento de chegada na fila de eventos
 
-            # se o cliente que chegou for o primeiro da fila
+            # se o cliente que chegou for o ultimo na fila
             if customers_on_system == 1: 
                 service_time = np.random.exponential(1/mu) # escolhe um numero da distribuição exponencial com media 1/mu para ser o tempo de atendimento
                 next_departure_time = elapsed_time + service_time # tempo da proxima partida é o tempo atual mais o tempo de atendimento
@@ -80,7 +83,11 @@ def simulate_queue(simulation_time, Lambda, mu):
                 next_departure_time = elapsed_time + service_time # tempo da proxima partida é o tempo atual mais o tempo de atendimento
                 next_departure_event = Event(EventType.DEPARTURE, next_departure_time) # cria um evento de partida com o tempo da proxima partida
                 heapq.heappush(customers_queue, next_departure_event) # adiciona o evento de partida na fila de eventos
+        
+            # se o próximo evento é saída e havia apenas um cliente no sistema
+            if customers_on_system == 0:
+                times_on_zero += 1
 
 
     # print(customers_arrived, area)
-    return area, customers_arrived
+    return area, customers_arrived, times_on_zero/total_events

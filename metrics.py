@@ -12,14 +12,16 @@ INFINITY = 1000
 def run_simulation(simulation_time, Lambda, mu):
     """ Simula infinitas rodadas e calcula a media de clientes e do tempo de espera em cada uma delas"""
     mean_customers_per_round = []
-    mean_waiting_time_per_round = []    
+    mean_waiting_time_per_round = []
+    frac_times_on_zero_per_round = []    
     
     for _ in range(INFINITY):
-        area, customers_arrived = simulate_queue(simulation_time, Lambda, mu)
+        area, customers_arrived, frac_times_on_zero = simulate_queue(simulation_time, Lambda, mu)
         mean_customers_per_round.append(area/simulation_time)
         mean_waiting_time_per_round.append(area/customers_arrived)
+        frac_times_on_zero_per_round.append(frac_times_on_zero)
 
-    return mean_customers_per_round, mean_waiting_time_per_round
+    return mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round
 
 
 def get_mean(mean_per_round):
