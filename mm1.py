@@ -7,6 +7,9 @@ import numpy as np
 from event import Event, EventType
 import heapq
 
+def finite_interval(interval, infinity):
+    True if interval < infinity else False
+
 
 def initialize():
     """ Inicializa as variáveis da simulação """
@@ -20,10 +23,12 @@ def initialize():
     times_on_zero = 0 # quantidade de vezes em zero
     total_events = 0 # quantidade total de eventos
     arrival_instants = [] # instantes de chegada dos clientes
-    waiting_density = {} # desidade do tempo de espera
+    waiting_density = {} # densidade do tempo de espera
     number_clients_density = {} # densidade do numero de clientes no sistema
+    finite_busy_times = 0 # total de periodos ocupados finitos
+    busy_times = 0 # total de periodos ocupados
 
-    return elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density
+    return elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density, finite_busy_times, busy_times
 
 
 def generate_first_event(Lambda):
@@ -35,7 +40,7 @@ def generate_first_event(Lambda):
 
 def simulate_queue(simulation_time, Lambda, mu):
     """ Simula a fila M/M/1 """
-    elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density = initialize()
+    elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density, finite_busy_times, busy_times = initialize()
 
     # Gerar um evento inicial de chegada
     initial_event = generate_first_event(Lambda)
@@ -59,6 +64,9 @@ def simulate_queue(simulation_time, Lambda, mu):
 
         # se o evento for um evento de chegada
         if event.type == EventType.ARRIVAL: 
+            if customers_on_system == 0:
+                busy_times += 1
+
             elapsed_time = event.time # tempo atual recebe o tempo do evento
             arrival_instants.append(elapsed_time) # adiciona o tempo de chegada do cliente na lista de tempos de chegada
             area += customers_on_system * (elapsed_time - last_event_time) # area recebe o numero de clientes no sistema multiplicado pelo tempo que eles ficaram no sistema
@@ -96,9 +104,10 @@ def simulate_queue(simulation_time, Lambda, mu):
         
             # se o próximo evento é saída e havia apenas um cliente no sistema
             if customers_on_system == 0:
-                times_on_zero += 1
-
+                times_on_zero += 1 # idle times
 
 
     # print(customers_arrived, area)
-    return area, customers_arrived, times_on_zero/total_events, waiting_density, number_clients_density
+    # print(times_on_zero/(busy_times))
+    # print(times_on_zero, busy_times)
+    return area, customers_arrived, times_on_zero/total_events, times_on_zero/(times_on_zero + busy_times), waiting_density, number_clients_density
