@@ -5,28 +5,32 @@
 
 import sys
 from mm1 import *
-from graphics import plot_cdf_number_clients, plot_cdf_waiting_time
+from graphics import *
+from analytical import *
 
 ROUNDS = 100
 
-
-def run_simulation(simulation_time, Lambda, mu):
+def run_simulation(simulation_time, Lambda, mu, max_width):
     """ Simula infinitas rodadas e calcula as metricas em cada uma delas"""
     mean_customers_per_round = []
     mean_waiting_time_per_round = []
     frac_times_on_zero_per_round = []
     busy_times_per_round = []
+    probability_reach_zero = []
     waiting_density = {}
-    number_clients_density = {}  
+    number_clients_density = {}
+    reach_0_before_max_per_round = []
     
     for _ in range(ROUNDS):
-        area, customers_arrived, frac_times_on_zero, frac_busy_times, waiting_density, number_clients_density = simulate_queue(simulation_time, Lambda, mu)
+        area, customers_arrived, frac_times_on_zero, frac_busy_times, waiting_density, number_clients_density, reach_0_before_max = simulate_queue(simulation_time, Lambda, mu, max_width)
         mean_customers_per_round.append(area/simulation_time)
         mean_waiting_time_per_round.append(area/customers_arrived)
         frac_times_on_zero_per_round.append(frac_times_on_zero)
         busy_times_per_round.append(frac_busy_times)
+        probability_reach_zero.append(1) if frac_times_on_zero > 0 else probability_reach_zero.append(0)
+        reach_0_before_max_per_round.append(reach_0_before_max)
 
-    return mean_customers_per_round, mean_waiting_time_per_round, busy_times_per_round, frac_times_on_zero_per_round, waiting_density, number_clients_density
+    return mean_customers_per_round, mean_waiting_time_per_round, busy_times_per_round, frac_times_on_zero_per_round, waiting_density, number_clients_density, probability_reach_zero, reach_0_before_max_per_round
 
 
 def get_mean(mean_per_round):
@@ -55,9 +59,9 @@ def plot_CDF(waiting_density, number_clients_density, Lambda, mu):
     plot_cdf_number_clients(number_clients_density, Lambda, mu)
 
     
-def calculate_metrics(Lambda, mu, simulation_time, scenario = 0):
+def calculate_metrics(Lambda, mu, simulation_time, max_width, scenario = 0):
     print(f"λ = {Lambda} & μ = {mu}")
-    mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round, frac_busy_times_per_round, waiting_density, number_clients_density = run_simulation(simulation_time, Lambda, mu)
+    mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round, frac_busy_times_per_round, waiting_density, number_clients_density, probability_reach_zero, reach_0_before_max_per_round = run_simulation(simulation_time, Lambda, mu, max_width)
 
     mean_customers_on_system = get_mean(mean_customers_per_round)
     variance_customers_on_system = get_variance(mean_customers_per_round, mean_customers_on_system)
@@ -79,23 +83,59 @@ def calculate_metrics(Lambda, mu, simulation_time, scenario = 0):
     sd_frac_busy_times = np.sqrt(variance_busy_times)
     confidence_interval_busy_times = get_confidence_interval(sd_frac_busy_times, mean_busy_times, len(frac_busy_times_per_round))
 
+    mean_prob_reach_zero = get_mean(probability_reach_zero)
+    variance_prob_reach_zero = get_variance(probability_reach_zero, mean_prob_reach_zero)
+    sd_prob_reach_zero = np.sqrt(variance_prob_reach_zero)
+    confidence_interval_prob_reach_zero = get_confidence_interval(sd_prob_reach_zero, mean_prob_reach_zero, len(probability_reach_zero))
+
+    mean_prob_go_zero_before_max  = get_mean(reach_0_before_max_per_round)
+    variance_prob_go_zero_before_max = get_variance(reach_0_before_max_per_round, mean_prob_go_zero_before_max)
+    sd_prob_go_zero_before_max = np.sqrt(variance_prob_go_zero_before_max)
+    confidence_interval_prob_go_zero_before_max = get_confidence_interval(sd_prob_go_zero_before_max, mean_prob_go_zero_before_max, len(reach_0_before_max_per_round))
+
     if scenario in (0, 1, 2):
-        print("Média do número de clientes no sistema: ", mean_customers_on_system)
-        print("-> Intervalo de confiança correspondente: ", confidence_interval_customers_on_system)
-        print("Média do tempo de espera: ", mean_waiting_time)
-        print("-> Intervalo de confiança correspondente: ", confidence_interval_waiting_time)
-        print("CDF do número de clientes no sistema: ") 
+        print("-- Média do número de clientes no sistema --")
+        print("Simulação: ", mean_customers_on_system)
+        print("Intervalo de confiança correspondente -> ", confidence_interval_customers_on_system)
+        print("Analítico (Lei de Little): ", get_mean_customers_on_system_by_littles_law(Lambda, mu))
+
+        print("\n-- Média do tempo de espera --")
+        print("Simulação: ", mean_waiting_time)
+        print("Intervalo de confiança correspondente -> ", confidence_interval_waiting_time)
+        print("Analítico: ", "TO-DO")
+
+        print("\n-- CDF do número de clientes no sistema --") 
         plot_cdf_number_clients(number_clients_density, Lambda, mu)
-        print("CDF do tempo de espera no sistema: ") 
+
+        print("\n-- CDF do tempo de espera no sistema --") 
         plot_cdf_waiting_time(waiting_density, Lambda, mu)
 
+        print("")
+
     if scenario in (0, 3, 4):
-        print("Fração de períodos ocupados finitos: ", mean_busy_times)
-        print("-> Intervalo de confiança correspondente: ", confidence_interval_busy_times)
-        
-    print("Fração de vezes que o sistema atinge o estado 0: ", mean_frac_times_on_zero) 
-    print("-> Intervalo de confiança correspondente: ", confidence_interval_frac_times_on_zero)
-    print("--------------------------------\n")
+        print("\n-- Fração de períodos ocupados finitos: --")
+        print("Simulação:", mean_busy_times)
+        print("Intervalo de confiança correspondente ->", confidence_interval_busy_times)
+        print("Analítico:", "TO-DO")
+    
+    print("\n-- Fração de vezes que o sistema atinge o estado 0 (Probabilidade de estar em 0 no regime estacionário) --")
+    print("Simulação: ", mean_frac_times_on_zero) 
+    print("Intervalo de confiança correspondente ->", confidence_interval_frac_times_on_zero)
+    if Lambda <= mu: # se o regime de serviço for conservado, podemos usar a fórmula da M/M/1
+        print("Analítico (Fórmula M/M/1): ", get_frac_times_on_i_by_mm1_formula(Lambda, mu, 0))
+    
+    if not(max_width): # fila infinita
+        print("\n-- Probabilidade de esvaziar (alcançar 0), dado que começou em 1 --")
+        print("Simulação: ", mean_prob_reach_zero) 
+        print("Intervalo de confiança correspondente ->", confidence_interval_prob_reach_zero)
+        print("Analítico (Ruína do Apostador): ", get_prob_reach_zero_by_gamblers_ruin(Lambda, mu, 1))
+    else: # fila finita
+        print("\n-- Probabilidade de esvaziar antes de estourar, dado que começou em 1 --")
+        print("Simulação: ", mean_prob_go_zero_before_max) 
+        print("Intervalo de confiança correspondente ->", confidence_interval_prob_go_zero_before_max)
+        print("Analítico (Ruína do Apostador): ", get_prob_reach_zero_by_gamblers_ruin_finite(Lambda, mu, max_width, 1)) # se a fila for finita, podemos usar a fórmula da ruína do apostador
+
+    print("\n--------------------------------\n")
 
 
 if __name__ == "__main__":

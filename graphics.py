@@ -1,3 +1,8 @@
+"""
+    * Modelagem e Avaliação de Desempenho - UFRJ - 2023.2
+    * Plotagem de gráficos
+"""
+
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import numpy as np

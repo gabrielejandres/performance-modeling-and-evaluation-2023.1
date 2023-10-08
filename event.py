@@ -1,3 +1,8 @@
+"""
+    * Modelagem e Avaliação de Desempenho - UFRJ - 2023.2
+    * Criação de eventos para o simulador de fila M/M/1
+"""
+
 from enum import Enum
 
 class EventType(Enum):

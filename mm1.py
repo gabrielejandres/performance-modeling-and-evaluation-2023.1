@@ -7,9 +7,6 @@ import numpy as np
 from event import Event, EventType
 import heapq
 
-def finite_interval(interval, infinity):
-    True if interval < infinity else False
-
 
 def initialize():
     """ Inicializa as variáveis da simulação """
@@ -25,10 +22,11 @@ def initialize():
     arrival_instants = [] # instantes de chegada dos clientes
     waiting_density = {} # densidade do tempo de espera
     number_clients_density = {} # densidade do numero de clientes no sistema
-    finite_busy_times = 0 # total de periodos ocupados finitos
     busy_times = 0 # total de periodos ocupados
+    reach_0_before_max = False # flag para saber se o sistema chegou a ficar vazio antes de atingir o limite de clientes
+    reach_max = False # flag para saber se o sistema atingiu o limite de clientes
 
-    return elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density, finite_busy_times, busy_times
+    return elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density, busy_times, reach_0_before_max, reach_max
 
 
 def generate_first_event(Lambda):
@@ -38,9 +36,9 @@ def generate_first_event(Lambda):
     return first_event 
 
 
-def simulate_queue(simulation_time, Lambda, mu):
+def simulate_queue(simulation_time, Lambda, mu, max_width):
     """ Simula a fila M/M/1 """
-    elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density, finite_busy_times, busy_times = initialize()
+    elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density, busy_times, reach_0_before_max, reach_max = initialize()
 
     # Gerar um evento inicial de chegada
     initial_event = generate_first_event(Lambda)
@@ -50,6 +48,8 @@ def simulate_queue(simulation_time, Lambda, mu):
 
     # Começar o loop da simulação (enquanto tempo atual for menor que o tempo total de simulação)
     while elapsed_time <= simulation_time:
+        # print("Num clientes: ", customers_on_system)
+
         event = heapq.heappop(customers_queue)
         total_events += 1
 
@@ -64,19 +64,28 @@ def simulate_queue(simulation_time, Lambda, mu):
 
         # se o evento for um evento de chegada
         if event.type == EventType.ARRIVAL: 
+
+            # quando tiverem 0 clientes e chegar um novo, incrementa a quantidade de períodos ocupados
             if customers_on_system == 0:
                 busy_times += 1
 
             elapsed_time = event.time # tempo atual recebe o tempo do evento
-            arrival_instants.append(elapsed_time) # adiciona o tempo de chegada do cliente na lista de tempos de chegada
+            
             area += customers_on_system * (elapsed_time - last_event_time) # area recebe o numero de clientes no sistema multiplicado pelo tempo que eles ficaram no sistema
-            customers_arrived += 1 # incrementa o numero de clientes que chegaram no sistema
-            customers_on_system += 1 # incrementa o numero de clientes no sistema
-            last_event_time = elapsed_time # atualiza o tempo do ultimo evento
             next_arrival_time = elapsed_time + np.random.exponential(1/Lambda) # escolhe um numero da distribuição exponencial com media 1/lambda para ser o tempo da proxima chegada
             next_arrival_event = Event(EventType.ARRIVAL, next_arrival_time) # cria um evento de chegada com o tempo da proxima chegada
             heapq.heappush(customers_queue, next_arrival_event) # adiciona o evento de chegada na fila de eventos
+            last_event_time = elapsed_time # atualiza o tempo do ultimo evento
 
+            if not max_width or customers_on_system < max_width:
+                # print(customers_on_system)
+                # print("entrou aqui")
+                customers_arrived += 1 # incrementa o numero de clientes que chegaram no sistema
+                customers_on_system += 1 # incrementa o numero de clientes no sistema
+                arrival_instants.append(elapsed_time) # adiciona o tempo de chegada do cliente na lista de tempos de chegada
+            elif customers_on_system == max_width:
+                reach_max = True
+                
             # se o cliente que chegou for o ultimo na fila
             if customers_on_system == 1: 
                 service_time = np.random.exponential(1/mu) # escolhe um numero da distribuição exponencial com media 1/mu para ser o tempo de atendimento
@@ -105,9 +114,12 @@ def simulate_queue(simulation_time, Lambda, mu):
             # se o próximo evento é saída e havia apenas um cliente no sistema
             if customers_on_system == 0:
                 times_on_zero += 1 # idle times
+                
+                if not reach_max:
+                    reach_0_before_max = True
 
 
     # print(customers_arrived, area)
     # print(times_on_zero/(busy_times))
     # print(times_on_zero, busy_times)
-    return area, customers_arrived, times_on_zero/total_events, times_on_zero/(times_on_zero + busy_times), waiting_density, number_clients_density
+    return area, customers_arrived, times_on_zero/total_events, times_on_zero/(times_on_zero + busy_times), waiting_density, number_clients_density, reach_0_before_max
