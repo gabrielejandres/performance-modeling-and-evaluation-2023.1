@@ -24,7 +24,8 @@ def run_simulation(simulation_time, Lambda, mu, max_width):
     for _ in range(ROUNDS):
         area, customers_arrived, frac_times_on_zero, frac_busy_times, waiting_density, number_clients_density, reach_0_before_max = simulate_queue(simulation_time, Lambda, mu, max_width)
         mean_customers_per_round.append(area/simulation_time)
-        mean_waiting_time_per_round.append(area/customers_arrived)
+        # mean_waiting_time_per_round.append(area/customers_arrived - 1/mu) # se fóssemos calcular só o tempo de espera, descontamos o tempo de serviço para que calculemos só o tempo de espera, desconsideramos o tempo de serviço
+        mean_waiting_time_per_round.append(area/customers_arrived) 
         frac_times_on_zero_per_round.append(frac_times_on_zero)
         busy_times_per_round.append(frac_busy_times)
         probability_reach_zero.append(1) if frac_times_on_zero > 0 else probability_reach_zero.append(0)
@@ -99,10 +100,10 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width, scenario = 0):
         print("Intervalo de confiança correspondente -> ", confidence_interval_customers_on_system)
         print("Analítico (Lei de Little): ", get_mean_customers_on_system_by_littles_law(Lambda, mu))
 
-        print("\n-- Média do tempo de espera --")
+        print("\n-- Média do tempo de espera (tempo de espera = tempo na fila de espera + tempo de serviço) --")
         print("Simulação: ", mean_waiting_time)
         print("Intervalo de confiança correspondente -> ", confidence_interval_waiting_time)
-        print("Analítico: ", "TO-DO")
+        print("Analítico: ", get_mean_response_time_by_mm1_formula(Lambda, mu))
 
         print("\n-- CDF do número de clientes no sistema --") 
         plot_cdf_number_clients(number_clients_density, Lambda, mu)
@@ -116,13 +117,18 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width, scenario = 0):
         print("\n-- Fração de períodos ocupados finitos: --")
         print("Simulação:", mean_busy_times)
         print("Intervalo de confiança correspondente ->", confidence_interval_busy_times)
-        print("Analítico:", "TO-DO")
-    
+        if Lambda < mu: # se o regime de serviço for conservado, podemos usar a fórmula da M/M/1
+            print("Analítico:", get_mean_busy_times_by_mm1_formula(Lambda, mu)) 
+        else:
+            print("Analítico: ", "TO-DO")
+        
     print("\n-- Fração de vezes que o sistema atinge o estado 0 (Probabilidade de estar em 0 no regime estacionário) --")
     print("Simulação: ", mean_frac_times_on_zero) 
     print("Intervalo de confiança correspondente ->", confidence_interval_frac_times_on_zero)
-    if Lambda <= mu: # se o regime de serviço for conservado, podemos usar a fórmula da M/M/1
+    if Lambda < mu: # se o regime de serviço for conservado, podemos usar a fórmula da M/M/1
         print("Analítico (Fórmula M/M/1): ", get_frac_times_on_i_by_mm1_formula(Lambda, mu, 0))
+    else:
+        print("Analítico: ", "TO-DO")
     
     if not(max_width): # fila infinita
         print("\n-- Probabilidade de esvaziar (alcançar 0), dado que começou em 1 --")
