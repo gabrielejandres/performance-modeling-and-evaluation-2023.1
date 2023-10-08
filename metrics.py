@@ -9,6 +9,7 @@ from graphics import *
 from analytical import *
 
 ROUNDS = 100
+DEFAULT_SCENARIO = 0
 
 def run_simulation(simulation_time, Lambda, mu, max_width):
     """ Simula infinitas rodadas e calcula as metricas em cada uma delas"""
@@ -60,7 +61,7 @@ def plot_CDF(waiting_density, number_clients_density, Lambda, mu):
     plot_cdf_number_clients(number_clients_density, Lambda, mu)
 
     
-def calculate_metrics(Lambda, mu, simulation_time, max_width, scenario = 0):
+def calculate_metrics(Lambda, mu, simulation_time, max_width, scenario = DEFAULT_SCENARIO):
     print(f"λ = {Lambda} & μ = {mu}")
     mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round, frac_busy_times_per_round, waiting_density, number_clients_density, probability_reach_zero, reach_0_before_max_per_round = run_simulation(simulation_time, Lambda, mu, max_width)
 
@@ -94,8 +95,8 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width, scenario = 0):
     sd_prob_go_zero_before_max = np.sqrt(variance_prob_go_zero_before_max)
     confidence_interval_prob_go_zero_before_max = get_confidence_interval(sd_prob_go_zero_before_max, mean_prob_go_zero_before_max, len(reach_0_before_max_per_round))
 
-    if scenario in (0, 1, 2):
-        print("-- Média do número de clientes no sistema --")
+    if scenario in (DEFAULT_SCENARIO, 1, 2):
+        print("\n-- Média do número de clientes no sistema --")
         print("Simulação: ", mean_customers_on_system)
         print("Intervalo de confiança correspondente -> ", confidence_interval_customers_on_system)
         print("Analítico (Lei de Little): ", get_mean_customers_on_system_by_littles_law(Lambda, mu))
@@ -113,14 +114,14 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width, scenario = 0):
 
         print("")
 
-    if scenario in (0, 3, 4):
+    if scenario in (DEFAULT_SCENARIO, 3, 4):
         print("\n-- Fração de períodos ocupados finitos: --")
         print("Simulação:", mean_busy_times)
         print("Intervalo de confiança correspondente ->", confidence_interval_busy_times)
         if Lambda < mu: # se o regime de serviço for conservado, podemos usar a fórmula da M/M/1
             print("Analítico:", get_mean_busy_times_by_mm1_formula(Lambda, mu)) 
         else:
-            print("Analítico: ", "TO-DO")
+            print("Analítico: ", "Não é possível calcular pois λ > μ")
         
     print("\n-- Fração de vezes que o sistema atinge o estado 0 (Probabilidade de estar em 0 no regime estacionário) --")
     print("Simulação: ", mean_frac_times_on_zero) 
@@ -128,7 +129,7 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width, scenario = 0):
     if Lambda < mu: # se o regime de serviço for conservado, podemos usar a fórmula da M/M/1
         print("Analítico (Fórmula M/M/1): ", get_frac_times_on_i_by_mm1_formula(Lambda, mu, 0))
     else:
-        print("Analítico: ", "TO-DO")
+        print("Analítico: ", "Não é possível calcular pois λ > μ")
     
     if not(max_width): # fila infinita
         print("\n-- Probabilidade de esvaziar (alcançar 0), dado que começou em 1 --")
@@ -141,7 +142,7 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width, scenario = 0):
         print("Intervalo de confiança correspondente ->", confidence_interval_prob_go_zero_before_max)
         print("Analítico (Ruína do Apostador): ", get_prob_reach_zero_by_gamblers_ruin_finite(Lambda, mu, max_width, 1)) # se a fila for finita, podemos usar a fórmula da ruína do apostador
 
-    print("\n--------------------------------\n")
+    print("\n-----------------------------------\n")
 
 
 if __name__ == "__main__":
