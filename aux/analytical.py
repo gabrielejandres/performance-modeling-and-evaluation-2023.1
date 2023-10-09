@@ -1,6 +1,6 @@
 """
     * Modelagem e Avaliação de Desempenho - UFRJ - 2023.2
-    * Cálculo de métricas analíticas para o modelo M/M/1
+    * Cálculo de métricas analíticas para o modelo M/M/1 e para a ruína do apostador
 """
 
 
@@ -22,8 +22,8 @@ def get_mean_waiting_time_by_mm1_formula(Lambda, mu):
 
 
 # Média de períodos ocupados pela fórmula da M/M/1
-def get_mean_busy_times_by_mm1_formula(Lambda, mu):
-    return 1 / (mu - Lambda)
+# def get_mean_busy_times_by_mm1_formula(Lambda, mu):
+#     return 1 / (mu - Lambda)
   
 
 # Distribuição estacionária em i (probabilidade de estar em i) pela fórmula da M/M/1
