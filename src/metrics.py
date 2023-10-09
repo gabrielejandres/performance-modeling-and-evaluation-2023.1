@@ -27,14 +27,13 @@ def run_simulation(simulation_time, Lambda, mu, max_width):
     for _ in range(ROUNDS):
         area, customers_arrived, frac_times_on_zero, frac_busy_times, waiting_density, number_clients_density, reach_0_before_max = simulate_queue(simulation_time, Lambda, mu, max_width)
         mean_customers_per_round.append(area/simulation_time)
-        # mean_waiting_time_per_round.append(area/customers_arrived - 1/mu) # se fóssemos calcular só o tempo de espera, descontamos o tempo de serviço para que calculemos só o tempo de espera, desconsideramos o tempo de serviço
         mean_waiting_time_per_round.append(area/customers_arrived) 
         frac_times_on_zero_per_round.append(frac_times_on_zero)
         busy_times_per_round.append(frac_busy_times)
         probability_reach_zero.append(1) if frac_times_on_zero > 0 else probability_reach_zero.append(0)
         reach_0_before_max_per_round.append(reach_0_before_max)
 
-    return mean_customers_per_round, mean_waiting_time_per_round, busy_times_per_round, frac_times_on_zero_per_round, waiting_density, number_clients_density, probability_reach_zero, reach_0_before_max_per_round
+    return mean_customers_per_round, mean_waiting_time_per_round, frac_times_on_zero_per_round, busy_times_per_round, waiting_density, number_clients_density, probability_reach_zero, reach_0_before_max_per_round
 
 
 def get_mean(mean_per_round):

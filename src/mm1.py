@@ -25,8 +25,10 @@ def initialize():
     busy_times = 0 # total de periodos ocupados
     reach_0_before_max = False # flag para saber se o sistema chegou a ficar vazio antes de atingir o limite de clientes
     reach_max = False # flag para saber se o sistema atingiu o limite de clientes
+    finite_busy_times = 0
+    count_finite_busy_times = 0
 
-    return elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density, busy_times, reach_0_before_max, reach_max
+    return elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density, busy_times, reach_0_before_max, reach_max, finite_busy_times, count_finite_busy_times
 
 
 def generate_first_event(Lambda):
@@ -38,7 +40,7 @@ def generate_first_event(Lambda):
 
 def simulate_queue(simulation_time, Lambda, mu, max_width):
     """ Simula a fila M/M/1 """
-    elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density, busy_times, reach_0_before_max, reach_max = initialize()
+    elapsed_time, customers_on_system, customers_served, customers_queue, customers_arrived, area, last_event_time, times_on_zero, total_events, arrival_instants, waiting_density, number_clients_density, busy_times, reach_0_before_max, reach_max, finite_busy_times, count_finite_busy_times = initialize()
 
     # Gerar um evento inicial de chegada
     initial_event = generate_first_event(Lambda)
@@ -61,6 +63,9 @@ def simulate_queue(simulation_time, Lambda, mu, max_width):
         
         # atualiza a densidade do numero de clientes no sistema
         number_clients_density[customers_on_system] = number_clients_density.get(customers_on_system, 0) + 1
+
+        if customers_on_system > 0:
+            count_finite_busy_times += 1
 
         # se o evento for um evento de chegada
         if event.type == EventType.ARRIVAL: 
@@ -114,8 +119,10 @@ def simulate_queue(simulation_time, Lambda, mu, max_width):
             # se o próximo evento é saída e havia apenas um cliente no sistema
             if customers_on_system == 0:
                 times_on_zero += 1 # idle times
-                
+                finite_busy_times += count_finite_busy_times
+                count_finite_busy_times = 0
+
                 if not reach_max:
                     reach_0_before_max = True
 
-    return area, customers_arrived, times_on_zero/total_events, times_on_zero/(times_on_zero + busy_times), waiting_density, number_clients_density, reach_0_before_max
+    return area, customers_arrived, times_on_zero/(times_on_zero + busy_times), finite_busy_times/total_events, waiting_density, number_clients_density, reach_0_before_max
