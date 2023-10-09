@@ -100,12 +100,12 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width = None, scenario = 
     if scenario in (DEFAULT_SCENARIO, 1, 2):
         print("\n-- Média do número de clientes no sistema --")
         print("Simulação: ", mean_customers_on_system)
-        print("Intervalo de confiança correspondente -> ", confidence_interval_customers_on_system)
+        print(f"Intervalo de confiança correspondente -> [{confidence_interval_customers_on_system[0]}, {confidence_interval_customers_on_system[1]}]", )
         print("Analítico (Lei de Little): ", get_mean_customers_on_system_by_littles_law(Lambda, mu))
 
         print("\n-- Média do tempo de espera (tempo de espera = tempo na fila de espera + tempo de serviço) --")
         print("Simulação: ", mean_waiting_time)
-        print("Intervalo de confiança correspondente -> ", confidence_interval_waiting_time)
+        print(f"Intervalo de confiança correspondente -> [{confidence_interval_waiting_time[0]}, {confidence_interval_customers_on_system[1]}]")
         print("Analítico: ", get_mean_response_time_by_mm1_formula(Lambda, mu))
 
         print("\n-- CDF do número de clientes no sistema --") 
@@ -119,12 +119,12 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width = None, scenario = 
     if scenario in (3, 4):
         print("\n-- Fração de períodos ocupados finitos: --")
         print("Simulação:", mean_busy_times)
-        print("Intervalo de confiança correspondente ->", confidence_interval_busy_times)
+        print(f"Intervalo de confiança correspondente -> [{confidence_interval_busy_times[0]}, {confidence_interval_busy_times[1]}]")
         print("Analítico: ", "Não é possível calcular pois λ > μ")
         
     print("\n-- Fração de vezes que o sistema atinge o estado 0 (Probabilidade de estar em 0 no regime estacionário) --")
     print("Simulação: ", mean_frac_times_on_zero) 
-    print("Intervalo de confiança correspondente ->", confidence_interval_frac_times_on_zero)
+    print(f"Intervalo de confiança correspondente -> [{confidence_interval_frac_times_on_zero[0]}, {confidence_interval_frac_times_on_zero[1]}]")
     if Lambda < mu: # se o regime de serviço for conservado, podemos usar a fórmula da M/M/1
         print("Analítico (Fórmula M/M/1): ", get_frac_times_on_i_by_mm1_formula(Lambda, mu, 0))
     else:
@@ -133,12 +133,12 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width = None, scenario = 
     if not(max_width): # fila infinita
         print("\n-- Probabilidade de esvaziar (alcançar 0), dado que começou em 1 --")
         print("Simulação: ", mean_prob_reach_zero) 
-        print("Intervalo de confiança correspondente ->", confidence_interval_prob_reach_zero)
+        print(f"Intervalo de confiança correspondente -> [{confidence_interval_prob_reach_zero[0]}, {confidence_interval_prob_reach_zero[1]}]")
         print("Analítico (Ruína do Apostador): ", get_prob_reach_zero_by_gamblers_ruin(Lambda, mu, 1))
     else: # fila finita
         print("\n-- Probabilidade de esvaziar antes de estourar, dado que começou em 1 --")
         print("Simulação: ", mean_prob_go_zero_before_max) 
-        print("Intervalo de confiança correspondente ->", confidence_interval_prob_go_zero_before_max)
+        print(f"Intervalo de confiança correspondente -> [{confidence_interval_prob_go_zero_before_max[0]}, {confidence_interval_prob_go_zero_before_max[1]}]")
         print("Analítico (Ruína do Apostador): ", get_prob_reach_zero_by_gamblers_ruin_finite(Lambda, mu, max_width, 1)) # se a fila for finita, podemos usar a fórmula da ruína do apostador
 
     print("\n------------------------------------\n")
