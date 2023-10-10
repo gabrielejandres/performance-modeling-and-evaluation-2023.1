@@ -104,7 +104,7 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width = None, scenario = 
 
         print("\n-- Média do tempo de espera (tempo de espera = tempo na fila de espera + tempo de serviço) --")
         print("Simulação: ", mean_waiting_time)
-        print(f"Intervalo de confiança correspondente -> [{confidence_interval_waiting_time[0]}, {confidence_interval_customers_on_system[1]}]")
+        print(f"Intervalo de confiança correspondente -> [{confidence_interval_waiting_time[0]}, {confidence_interval_waiting_time[1]}]")
         print("Analítico: ", get_mean_response_time_by_mm1_formula(Lambda, mu))
 
         print("\n-- CDF do número de clientes no sistema --") 
