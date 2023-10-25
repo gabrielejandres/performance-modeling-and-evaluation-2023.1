@@ -54,6 +54,7 @@ def calculate_metrics(Lambda, mu, simulation_time, max_width = None):
 
     print("\n-- Média do tempo de espera (tempo de espera = tempo na fila de espera + tempo de serviço) --")
     print("Simulação: E(T) = ", mean_waiting_time)
+    print("Desvio padrão: σ = ", sd_waiting_time)
     print(f"Intervalo de confiança correspondente -> [{confidence_interval_waiting_time[0]}, {confidence_interval_waiting_time[1]}]")
     print("Analítico: E(T) = ", get_analytical_waiting_time(Lambda, mu))
 
