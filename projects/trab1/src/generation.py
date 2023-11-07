@@ -1,13 +1,27 @@
+from node import Node
+
+
 class Generation:
     def __init__(self, population):
         self.population = population
-        self.offspring = []
+        self.nodes = [Node() for _ in range(population)]
 
-    def add_offspring(self, offspring_count):
-        self.offspring.append(offspring_count)
+    def finish_node(self, node, elapsed_time, offspring):
+        self.nodes[node].finish(elapsed_time, offspring)
 
     def get_total_offspring(self):
-        return sum(self.offspring)
+        return sum([node.offspring for node in self.nodes])
+
+    def get_total_time(self):
+        return sum([node.elapsed_time for node in self.nodes])
+
+    def get_max_node_offspring(self):
+        return max([node.offspring for node in self.nodes])
 
     def __str__(self):
-        return f'Generation(mean={self.get_total_offspring()/self.population}, population={self.population}, offspring={self.offspring})'
+        mean = (
+            0 if self.population == 0 else self.get_total_offspring() / self.population
+        )
+
+        text = f"Generation(mean={mean}, elapsed_time={self.get_total_time()}, population={self.population})"
+        return text
