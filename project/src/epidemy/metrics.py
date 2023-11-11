@@ -1,6 +1,12 @@
-def generate_metrics(simulations):
-    # for tree in simulations:
-    #     print(tree)
+import sys
+from epidemy import simulate
+
+def generate_metrics(mu, Lambda, is_deterministic, size_initial_population, max_generations, total_runs):
+    simulations = []
+    for i in range(total_runs):
+        simulations.append(
+            simulate(mu, Lambda, is_deterministic, size_initial_population, max_generations)
+        )
     print(f"Fraction of finite trees: {finite_tree_fraction(simulations)}")
     print(f"Offspring distribution: {get_offspring_distribution(simulations)}")
     print(f"Mean root offspring: {get_mean_root_offspring(simulations)}")
@@ -96,3 +102,20 @@ def get_mean_busy_period_duration(simulations):
     if total_extinct_trees == 0:
         return None
     return total_busy_period_duration / total_extinct_trees
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 7:
+        print(
+            "Usage: python3 metrics.py <max_generations> <mu> <lambda> <is_deterministic> <size_initial_population> <total_runs>"
+        )
+        exit(1)
+
+    max_generations = int(sys.argv[1])
+    mu = float(sys.argv[2])
+    Lambda = float(sys.argv[3])
+    is_deterministic = True if sys.argv[4] == "1" else False
+    size_initial_population = int(sys.argv[5])
+    total_runs = int(sys.argv[6])
+
+    generate_metrics(mu, Lambda, is_deterministic, size_initial_population, max_generations, total_runs)

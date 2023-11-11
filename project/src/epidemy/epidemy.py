@@ -1,7 +1,5 @@
 import numpy as np
 from generation import Generation
-import sys
-from metrics import generate_metrics
 from tree import EpidemyTree
 
 
@@ -30,26 +28,3 @@ def simulate(mu, Lambda, is_deterministic, size_initial_population, max_generati
         size_last_offspring = current_generation.get_total_offspring()
 
     return EpidemyTree(generations)
-
-
-if __name__ == "__main__":
-    if len(sys.argv) < 7:
-        print(
-            "Usage: python3 epidemy.py <max_generations> <mu> <Lambda> <is_deterministic> <size_initial_population> <total_runs>"
-        )
-        exit(1)
-
-    max_generations = int(sys.argv[1])
-    mu = float(sys.argv[2])
-    Lambda = float(sys.argv[3])
-    is_deterministic = True if sys.argv[4] == "1" else False
-    size_initial_population = int(sys.argv[5])
-    total_runs = int(sys.argv[6])
-
-    simulations = []
-    for i in range(total_runs):
-        simulations.append(
-            simulate(mu, Lambda, is_deterministic, size_initial_population, max_generations)
-        )
-
-    generate_metrics(simulations)
