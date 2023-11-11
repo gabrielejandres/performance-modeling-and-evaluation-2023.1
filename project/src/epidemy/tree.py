@@ -23,6 +23,15 @@ class EpidemyTree:
 
     def get_total_elapsed_time(self):
         return sum([generation.get_total_time() for generation in self.generations])
+    
+    def get_nodes_offspring_distribution(self):
+        distribution = [0] * (self.get_max_node_offspring() + 1)
+        for generation in self.generations:
+            for distribution_index, node_offspring in enumerate(generation.get_nodes_offspring_density()):
+                distribution[distribution_index] += node_offspring
+
+        return distribution
+
 
     def __str__(self):
         text = ""

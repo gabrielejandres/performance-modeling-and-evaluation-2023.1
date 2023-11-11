@@ -17,6 +17,13 @@ class Generation:
 
     def get_max_node_offspring(self):
         return max([node.offspring for node in self.nodes])
+    
+    def get_nodes_offspring_density(self):
+        density = [0] * (self.get_max_node_offspring() + 1)
+        for node in self.nodes:
+            density[node.offspring] += 1
+
+        return density
 
     def __str__(self):
         mean = (

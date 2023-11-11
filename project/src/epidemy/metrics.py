@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
 def generate_metrics(simulations):
     # for tree in simulations:
     #     print(tree)
@@ -8,6 +11,7 @@ def generate_metrics(simulations):
     print(f"Mean tree height: {get_mean_tree_height(simulations)}")
     print(f"Mean node height: {get_mean_node_height(simulations)}")
     print(f"Mean busy period duration: {get_mean_busy_period_duration(simulations)}")
+    print(f"CDF offspring distribution: {plot_cdf_offspring_distribution(simulations)}")
 
 
 def finite_tree_fraction(simulations):
@@ -96,3 +100,44 @@ def get_mean_busy_period_duration(simulations):
     if total_extinct_trees == 0:
         return None
     return total_busy_period_duration / total_extinct_trees
+
+
+def plot_cdf_offspring_distribution(simulations):
+    density = [0] * (max(get_offspring_distribution(simulations).keys()) + 1)
+    for tree in simulations:
+        for distribution_index, node_offspring in enumerate(
+            tree.get_nodes_offspring_distribution()
+        ):
+            density[distribution_index] += node_offspring
+
+    print(density)
+    x, y = calculate_cdf(density)
+
+    plot_graphic(x, y, "CDF offspring distribution", "Offspring", "CDF", True)
+    
+
+def calculate_cdf(density):
+  # Prepara eixo X
+  x = np.array([i for i in range(len(density))])
+
+  # Prepara eixo Y
+  y = np.array([density for density in density])
+  y = np.cumsum(y)
+
+  # Normaliza
+  y = y / y[-1]
+
+  return x, y
+
+
+def plot_graphic(x, y, title, xlabel, ylabel, discrete = False):
+  if discrete:
+    plt.xticks(range(0, len(y)))
+    plt.bar(x, y)
+  else:
+    plt.plot(x, y)
+    
+  plt.xlabel(xlabel)
+  plt.ylabel(ylabel)
+  plt.title(title)
+  plt.show()

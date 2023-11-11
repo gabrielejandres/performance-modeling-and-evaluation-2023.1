@@ -4,6 +4,7 @@ import sys
 from metrics import generate_metrics
 from tree import EpidemyTree
 
+MAX_GENERATION_SIZE = 10000
 
 def generate_offspring(mu, Lambda, is_deterministic):
     if is_deterministic:
@@ -22,7 +23,11 @@ def simulate(mu, Lambda, is_deterministic, size_initial_population, max_generati
     generations = []
     size_last_offspring = size_initial_population
     while len(generations) < max_generations and size_last_offspring > 0:
+        if size_last_offspring > MAX_GENERATION_SIZE:
+            break
+
         current_generation = Generation(size_last_offspring)
+
         for i in range(current_generation.population):
             elapsed_time, offspring = generate_offspring(mu, Lambda, is_deterministic)
             current_generation.finish_node(i, elapsed_time, offspring)
@@ -48,6 +53,7 @@ if __name__ == "__main__":
 
     simulations = []
     for i in range(total_runs):
+        print(i)
         simulations.append(
             simulate(mu, Lambda, is_deterministic, size_initial_population, max_generations)
         )
