@@ -4,7 +4,7 @@
 """
 
 import sys
-sys.path.append('../')
+sys.path.append('../../')
  
 from mm1 import *
 from aux.graphics import *
