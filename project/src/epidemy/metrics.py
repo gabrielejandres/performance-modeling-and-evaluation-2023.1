@@ -7,13 +7,14 @@ def generate_metrics(mu, Lambda, is_deterministic, size_initial_population, max_
         simulations.append(
             simulate(mu, Lambda, is_deterministic, size_initial_population, max_generations)
         )
-    print(f"Fraction of finite trees: {finite_tree_fraction(simulations)}")
-    print(f"Offspring distribution: {get_offspring_distribution(simulations)}")
-    print(f"Mean root offspring: {get_mean_root_offspring(simulations)}")
-    print(f"Mean max offspring: {get_mean_max_offspring(simulations)}")
-    print(f"Mean tree height: {get_mean_tree_height(simulations)}")
-    print(f"Mean node height: {get_mean_node_height(simulations)}")
-    print(f"Mean busy period duration: {get_mean_busy_period_duration(simulations)}")
+    print(f"Fração de árvores finitas (epidemias extintas): {finite_tree_fraction(simulations)}")
+    print(f"Distribuição dos graus de saída (Offspring distribution): {get_offspring_distribution(simulations)}")
+    print(f"Média do grau de saída da raiz: {get_mean_root_offspring(simulations)}")
+    print(f"Média do grau de saída máximo: {get_mean_max_offspring(simulations)}")
+    print(f"Média de altura da árvore: {get_mean_tree_height(simulations)}")
+    print(f"Média de altura dos nós: {get_mean_node_height(simulations)}")
+    print(f"Média da duração do período ocupado: {get_mean_busy_period_duration(simulations)}")
+    print(f"Média do número de clientes atendidos por período ocupado (antes da extinção): TO-DO")
 
 
 def finite_tree_fraction(simulations):
