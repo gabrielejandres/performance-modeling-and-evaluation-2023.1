@@ -1,16 +1,22 @@
-import matplotlib.pyplot as plt
+import sys
+from epidemy import simulate
 import numpy as np
+import matplotlib.pyplot as plt
 
-def generate_metrics(simulations):
-    # for tree in simulations:
-    #     print(tree)
-    print(f"Fraction of finite trees: {finite_tree_fraction(simulations)}")
-    print(f"Offspring distribution: {get_offspring_distribution(simulations)}")
-    print(f"Mean root offspring: {get_mean_root_offspring(simulations)}")
-    print(f"Mean max offspring: {get_mean_max_offspring(simulations)}")
-    print(f"Mean tree height: {get_mean_tree_height(simulations)}")
-    print(f"Mean node height: {get_mean_node_height(simulations)}")
-    print(f"Mean busy period duration: {get_mean_busy_period_duration(simulations)}")
+def generate_metrics(mu, Lambda, is_deterministic, size_initial_population, max_generations, total_runs):
+    simulations = []
+    for i in range(total_runs):
+        simulations.append(
+            simulate(mu, Lambda, is_deterministic, size_initial_population, max_generations)
+        )
+    print(f"Fração de árvores finitas (epidemias extintas): {finite_tree_fraction(simulations)}")
+    print(f"Distribuição dos graus de saída (Offspring distribution): {get_offspring_distribution(simulations)}")
+    print(f"Média do grau de saída da raiz: {get_mean_root_offspring(simulations)}")
+    print(f"Média do grau de saída máximo: {get_mean_max_offspring(simulations)}")
+    print(f"Média de altura da árvore: {get_mean_tree_height(simulations)}")
+    print(f"Média de altura dos nós: {get_mean_node_height(simulations)}")
+    print(f"Média da duração do período ocupado: {get_mean_busy_period_duration(simulations)}")
+    print(f"Média do número de clientes atendidos por período ocupado (antes da extinção): TO-DO")
     print(f"CDF offspring distribution: {plot_cdf_offspring_distribution(simulations)}")
 
 
@@ -141,3 +147,19 @@ def plot_graphic(x, y, title, xlabel, ylabel, discrete = False):
   plt.ylabel(ylabel)
   plt.title(title)
   plt.show()
+
+if __name__ == "__main__":
+    if len(sys.argv) < 7:
+        print(
+            "Usage: python3 metrics.py <max_generations> <mu> <lambda> <is_deterministic> <size_initial_population> <total_runs>"
+        )
+        exit(1)
+
+    max_generations = int(sys.argv[1])
+    mu = float(sys.argv[2])
+    Lambda = float(sys.argv[3])
+    is_deterministic = True if sys.argv[4] == "1" else False
+    size_initial_population = int(sys.argv[5])
+    total_runs = int(sys.argv[6])
+
+    generate_metrics(mu, Lambda, is_deterministic, size_initial_population, max_generations, total_runs)
