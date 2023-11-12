@@ -1,7 +1,10 @@
 import sys
 from epidemy import simulate
 import numpy as np
-import matplotlib.pyplot as plt
+
+sys.path.append('../../')
+from aux.graphics import *
+from aux.analytical import *
 
 def generate_metrics(mu, Lambda, is_deterministic, size_initial_population, max_generations, total_runs):
     simulations = []
@@ -9,16 +12,45 @@ def generate_metrics(mu, Lambda, is_deterministic, size_initial_population, max_
         simulations.append(
             simulate(mu, Lambda, is_deterministic, size_initial_population, max_generations)
         )
-    print(f"Fração de árvores finitas (epidemias extintas): {finite_tree_fraction(simulations)}")
-    print(f"Distribuição dos graus de saída (Offspring distribution): {get_offspring_distribution(simulations)}")
-    print(f"Média do grau de saída da raiz: {get_mean_root_offspring(simulations)}")
-    print(f"Média do grau de saída máximo: {get_mean_max_offspring(simulations)}")
-    print(f"Média de altura da árvore: {get_mean_tree_height(simulations)}")
-    print(f"Média de altura dos nós: {get_mean_node_height(simulations)}")
-    print(f"Média da duração do período ocupado: {get_mean_busy_period_duration(simulations)}")
-    print(f"Média do número de clientes atendidos por período ocupado (antes da extinção): TO-DO")
-    print(f"CDF offspring distribution: {plot_cdf_offspring_distribution(simulations)}")
+    print(f"λ = {Lambda} & μ = {mu}")
+    print("\n-- Fração de árvores finitas (epidemias extintas) --")
+    print("Simulação: ", finite_tree_fraction(simulations))
+    print(f"Intervalo de confiança correspondente -> [TO-DO]")
+    print(f"Analítico (s = G(s)): ", finite_tree_fraction_analytical(Lambda, mu))
 
+    print("\n-- Distribuição dos graus de saída (offspring distribution) --")
+    print("Simulação: ", get_offspring_distribution(simulations))
+    print(f"CDF distribuição dos graus de saída (offspring distribution): {plot_cdf_offspring_distribution(simulations, (max(get_offspring_distribution(simulations).keys()) + 1))}")
+
+    print("\n-- Média do grau de saída da raiz --")
+    print("Simulação: ", get_mean_root_offspring(simulations))
+    print(f"Intervalo de confiança correspondente -> [TO-DO]")
+
+    print("\n-- Média do grau de saída máximo --")
+    print("Simulação: ", get_mean_max_offspring(simulations))
+    print(f"Intervalo de confiança correspondente -> [TO-DO]")
+
+    print("\n-- Média do grau de saída máximo --")
+    print("Simulação: ", get_mean_max_offspring(simulations))
+    print(f"Intervalo de confiança correspondente -> [TO-DO]")
+
+    print("\n-- Média de altura da árvore --")
+    print("Simulação: ", get_mean_tree_height(simulations))
+    print(f"Intervalo de confiança correspondente -> [TO-DO]")
+
+    print("\n-- Média de altura dos nós --")
+    print("Simulação: ", get_mean_node_height(simulations))
+    print(f"Intervalo de confiança correspondente -> [TO-DO]")
+
+    print("\n-- Média da duração do período ocupado --")
+    print("Simulação: ", get_mean_busy_period_duration(simulations))
+    print(f"Intervalo de confiança correspondente -> [TO-DO]")
+
+    print("\n-- Média do número de clientes atendidos por período ocupado (antes da extinção) --")
+    print("Simulação: ", get_mean_total_progeny(simulations))
+    print(f"Intervalo de confiança correspondente -> [TO-DO]")
+    mean_offspring_generation = Lambda # MUDAR
+    print(f"Analítico: ", total_progeny(mean_offspring_generation, size_initial_population), " TO-DO")
 
 def finite_tree_fraction(simulations):
     total_extinct_simulations = 0
@@ -107,46 +139,19 @@ def get_mean_busy_period_duration(simulations):
         return None
     return total_busy_period_duration / total_extinct_trees
 
-
-def plot_cdf_offspring_distribution(simulations):
-    density = [0] * (max(get_offspring_distribution(simulations).keys()) + 1)
+def get_mean_total_progeny(simulations):
+    total_progeny = 0
     for tree in simulations:
-        for distribution_index, node_offspring in enumerate(
-            tree.get_nodes_offspring_distribution()
-        ):
-            density[distribution_index] += node_offspring
+        total_progeny += tree.get_total_offspring()
 
-    print(density)
-    x, y = calculate_cdf(density)
+    return total_progeny / len(simulations)
 
-    plot_graphic(x, y, "CDF offspring distribution", "Offspring", "CDF", True)
+def get_confidence_interval(standard_deviation, sample_mean, sample_size):
+    """ Calcula o intervalo de confiança """
+    lowest_point = sample_mean - 1.96 * (standard_deviation / np.sqrt(sample_size))
+    highest_point = sample_mean + 1.96 * (standard_deviation / np.sqrt(sample_size))
     
-
-def calculate_cdf(density):
-  # Prepara eixo X
-  x = np.array([i for i in range(len(density))])
-
-  # Prepara eixo Y
-  y = np.array([density for density in density])
-  y = np.cumsum(y)
-
-  # Normaliza
-  y = y / y[-1]
-
-  return x, y
-
-
-def plot_graphic(x, y, title, xlabel, ylabel, discrete = False):
-  if discrete:
-    plt.xticks(range(0, len(y)))
-    plt.bar(x, y)
-  else:
-    plt.plot(x, y)
-    
-  plt.xlabel(xlabel)
-  plt.ylabel(ylabel)
-  plt.title(title)
-  plt.show()
+    return (lowest_point, highest_point)
 
 if __name__ == "__main__":
     if len(sys.argv) < 7:

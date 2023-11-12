@@ -20,6 +20,7 @@ def generate_offspring(mu, Lambda, is_deterministic):
 def simulate(mu, Lambda, is_deterministic, size_initial_population, max_generations):
     generations = []
     size_last_offspring = size_initial_population
+
     while len(generations) < max_generations and size_last_offspring > 0:
         if size_last_offspring > MAX_GENERATION_SIZE:
             break

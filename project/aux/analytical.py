@@ -1,6 +1,6 @@
 """
     * Modelagem e Avaliação de Desempenho - UFRJ - 2023.2
-    * Cálculo de métricas analíticas para o modelo M/M/1 e para a ruína do apostador
+    * Cálculo de métricas analíticas para o modelo M/M/1, para a ruína do apostador e processos de ramificação
 """
 
 
@@ -49,3 +49,15 @@ def get_prob_reach_zero_by_gamblers_ruin(Lambda, mu, k):
         return pow(mu/Lambda, k)
     else:
         return 1.0
+
+# Fração de árvores finitas (epidemias extintas) utilizando a transformada G(s) com tempo de serviço exponencial
+def finite_tree_fraction_analytical(Lambda, mu):
+    if mu < Lambda:
+        return mu/Lambda
+    else:
+        return 1.0
+    
+def total_progeny(mean_offspring_generation, size_initial_population):
+    if mean_offspring_generation == 1:
+        return "∞"
+    return size_initial_population / (1 - mean_offspring_generation)
