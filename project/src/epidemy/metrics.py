@@ -49,8 +49,7 @@ def generate_metrics(mu, Lambda, is_deterministic, size_initial_population, max_
     print("\n-- Média do número de clientes atendidos por período ocupado (antes da extinção) --")
     print("Simulação: ", get_mean_total_progeny(simulations))
     print(f"Intervalo de confiança correspondente -> [TO-DO]")
-    mean_offspring_generation = Lambda # MUDAR
-    print(f"Analítico: ", total_progeny(mean_offspring_generation, size_initial_population), " TO-DO")
+    print(f"Analítico: ", total_progeny(Lambda, size_initial_population), " TO-DO")
 
 def finite_tree_fraction(simulations):
     total_extinct_simulations = 0
