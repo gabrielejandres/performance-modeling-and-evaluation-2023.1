@@ -5,7 +5,8 @@
 
 from metrics import *
 
-TOTAL_RUNS = 1000
+# O(TOTAL_RUNS * MAX_GENERATIONS * MAX_GENERATION_SIZE) = O(1e2 * 1e2 * 1e4) = O(1e8)
+TOTAL_RUNS = 10000
 SIZE_INITIAL_POPULATION = 1
 MAX_GENERATIONS = 100
 
@@ -25,4 +26,4 @@ if __name__ == "__main__":
     # print_scenario_information(scenario = 1, mu = 2, Lambda = 1, is_deterministic = True) # Cenario 1
     # print_scenario_information(scenario = 2, mu = 4, Lambda = 2, is_deterministic = True) # Cenario 2
     # print_scenario_information(scenario = 3, mu = 1, Lambda = 1.05, is_deterministic = True) # Cenario 3
-    # print_scenario_information(scenario = 4, mu = 1, Lambda = 1.10, is_deterministic = True) # Cenario 4
+    # print_scenario_information(scenario = 4, mu = 1, Lambda = 1.10, is_deterministic = True) # Cenario 4https://prod.liveshare.vsengsaas.visualstudio.com/join?3C476D3AB939BEA9C2E372153D8CD514B44D

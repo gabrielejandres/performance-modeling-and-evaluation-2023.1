@@ -32,7 +32,6 @@ class EpidemyTree:
 
         return distribution
 
-
     def __str__(self):
         text = ""
         text += "Tree extinct: " + str(self.is_tree_extinct()) + "\n"

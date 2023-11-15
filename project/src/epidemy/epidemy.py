@@ -2,7 +2,7 @@ import numpy as np
 from generation import Generation
 from tree import EpidemyTree
 
-MAX_GENERATION_SIZE = 10000
+MAX_GENERATION_SIZE = 100
 
 def generate_offspring(mu, Lambda, is_deterministic):
     if is_deterministic:
