@@ -3,6 +3,7 @@
     * Cálculo de métricas analíticas para o modelo M/M/1, para a ruína do apostador e processos de ramificação
 """
 
+import math
 
 # Lei de little para calcular a média de clientes no sistema
 def get_mean_customers_on_system_by_littles_law(Lambda, mu):
@@ -57,7 +58,7 @@ def finite_tree_fraction_analytical(Lambda, mu):
     else:
         return 1.0
     
-def total_progeny(mean_offspring_generation, size_initial_population):
-    if mean_offspring_generation == 1:
-        return "∞"
-    return size_initial_population / (1 - mean_offspring_generation)
+def total_progeny(Lambda, mu, size_initial_population):
+    if Lambda/mu >= 1:
+        return math.inf
+    return abs(size_initial_population / (1 - Lambda/mu))
