@@ -42,13 +42,15 @@ def generate_metrics(mu, Lambda, is_deterministic, size_initial_population, max_
     print("\n-- Média da duração do período ocupado --")
     print("Simulação: ", get_mean_busy_period_duration(simulations))
     print(f"Intervalo de confiança correspondente -> {get_confidence_interval(get_mean_busy_period_duration_per_round(simulations))}")
+    if Lambda <= mu:
+        print(f"Analítico (M/M/1): ", get_mean_response_time_by_mm1_formula(Lambda, mu))
 
     mean_total_progeny = get_mean_total_progeny(simulations)
     print("\n-- Média do número de clientes atendidos por período ocupado (antes da extinção) --")
     print("Simulação: ", mean_total_progeny)
     if mean_total_progeny != math.inf:
         print(f"Intervalo de confiança correspondente -> {get_confidence_interval([tree.get_total_offspring() for tree in simulations if tree.is_tree_extinct()])}")
-    print(f"Analítico: ", total_progeny(Lambda, mu, size_initial_population))
+    print(f"Analítico (progenia total): ", total_progeny(get_offspring_mean(Lambda, mu), size_initial_population))
 
 def finite_tree_fraction(simulations):
     total_extinct_simulations = 0
@@ -68,10 +70,14 @@ def get_offspring_distribution(simulations):
                     offspring_distribution[node.offspring] = 0
                 offspring_distribution[node.offspring] += 1
 
+    total_offspring = sum(offspring_distribution.values())
+    for key in offspring_distribution.keys():
+        offspring_distribution[key] /= total_offspring
+
     offspring_distribution = dict(
         sorted(offspring_distribution.items(), key=lambda item: item[0])
     ) 
-    return offspring_distribution
+    return offspring_distribution 
 
 
 def get_mean_root_offspring(simulations):

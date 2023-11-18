@@ -34,11 +34,11 @@ class EpidemyTree:
 
     def __str__(self):
         text = ""
-        text += "Tree extinct: " + str(self.is_tree_extinct()) + "\n"
-        text += "Total generations: " + str(self.get_total_generations()) + "\n"
-        text += "Total population: " + str(self.get_total_population()) + "\n"
-        text += "Total offspring: " + str(self.get_total_offspring()) + "\n"
+        text += "Árvores extinstas: " + str(self.is_tree_extinct()) + "\n"
+        text += "Total de gerações: " + str(self.get_total_generations()) + "\n"
+        text += "Total da população: " + str(self.get_total_population()) + "\n"
+        text += "Total de filhos: " + str(self.get_total_offspring()) + "\n"
         text += (
-            "Root offspring: " + str(self.generations[0].get_total_offspring()) + "\n"
+            "Filhos da raiz: " + str(self.generations[0].get_total_offspring()) + "\n"
         )
         return text

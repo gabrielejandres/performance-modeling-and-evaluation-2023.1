@@ -57,8 +57,16 @@ def finite_tree_fraction_analytical(Lambda, mu):
         return mu/Lambda
     else:
         return 1.0
-    
-def total_progeny(Lambda, mu, size_initial_population):
-    if Lambda/mu >= 1:
+
+# Progenia total de um processo de ramificação 
+def total_progeny(mean_offspring_generation, size_initial_population):
+    if mean_offspring_generation >= 1:
         return math.inf
-    return abs(size_initial_population / (1 - Lambda/mu))
+    return abs(size_initial_population / (1 - mean_offspring_generation))
+
+# Média de filhos em uma geração é a média de clientes que chegam durante um serviço. 
+# Se lambda < mu, o serviço é mais rápido, então a média de clientes que chegam durante um serviço é 0 pois os clientes chegam mais lentamente.
+def get_offspring_mean(Lambda, mu):
+    if Lambda >= mu:
+        return Lambda/mu
+    return 0

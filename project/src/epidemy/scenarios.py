@@ -15,15 +15,20 @@ def print_scenario_information(scenario, mu, Lambda, is_deterministic = False, s
     generate_metrics(mu, Lambda, is_deterministic, size_initial_population, max_generations, total_runs)
 
 
-if __name__ == "__main__":
+def print_deterministic():
+    print("=============== Tempo de serviço determinístico ===============\n")
+    print_scenario_information(scenario = 1, mu = 2, Lambda = 1, is_deterministic = True) # Cenario 1
+    print_scenario_information(scenario = 2, mu = 4, Lambda = 2, is_deterministic = True) # Cenario 2
+    print_scenario_information(scenario = 3, mu = 1, Lambda = 1.05, is_deterministic = True) # Cenario 3
+    print_scenario_information(scenario = 4, mu = 1, Lambda = 1.10, is_deterministic = True) # Cenario 4
+
+def print_exponential():
     print("=============== Tempo de serviço exponencial ===============")
     print_scenario_information(scenario = 1, mu = 2, Lambda = 1) # Cenario 1
     print_scenario_information(scenario = 2, mu = 4, Lambda = 2) # Cenario 2
     print_scenario_information(scenario = 3, mu = 1, Lambda = 1.05) # Cenario 3
     print_scenario_information(scenario = 4, mu = 1, Lambda = 1.10) # Cenario 4
 
-    # print("=============== Tempo de serviço determinístico ===============\n")
-    # print_scenario_information(scenario = 1, mu = 2, Lambda = 1, is_deterministic = True) # Cenario 1
-    # print_scenario_information(scenario = 2, mu = 4, Lambda = 2, is_deterministic = True) # Cenario 2
-    # print_scenario_information(scenario = 3, mu = 1, Lambda = 1.05, is_deterministic = True) # Cenario 3
-    # print_scenario_information(scenario = 4, mu = 1, Lambda = 1.10, is_deterministic = True) # Cenario 4https://prod.liveshare.vsengsaas.visualstudio.com/join?3C476D3AB939BEA9C2E372153D8CD514B44D
+if __name__ == "__main__":
+    print_exponential()
+    print_deterministic()

@@ -6,7 +6,7 @@ MAX_GENERATION_SIZE = 100
 
 def generate_offspring(mu, Lambda, is_deterministic):
     if is_deterministic:
-        service_time = mu
+        service_time = 1/mu
     else:
         service_time = np.random.exponential(1 / mu)
     total_arrivals = 0
